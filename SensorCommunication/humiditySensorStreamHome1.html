@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+<meta charset="utf-8" />
+<title></title>
+
+<script type="text/javascript" src="javascript/jquery-1.7.1.min.js"></script>
+
+</head>
+<body>
+<div id="fb-root"></div>
+<script>
+window.fbAsyncInit = function() {
+  // init the FB JS SDK
+  FB.init({
+    appId      : '130245313792181', // App ID from the App Dashboard
+    status     : true, // check the login status upon init?
+    cookie     : true, // set sessions cookies to allow your server to access the session?
+    xfbml      : true  // parse XFBML tags on this page?
+  });
+
+  window.setInterval(getThenPost, 1 * 60 * 1000);
+
+  function getThenPost() {
+    $.ajax({
+      type: "GET",
+      url: "index.xml",
+      dataType: "text",
+      success: function(text) {
+        // Trim the whitespace
+        var trimmedText = $.trim(text);
+        // Reparse as XML
+        var xml = $.parseXML(trimmedText);      
+        $(xml).find('device').each(function(){
+          var name = $(this).attr('name');
+          if(name == 'Home1') {
+            $(this).find('field').each(function() {
+              var key = $(this).attr('key');
+              if(key == 'Humidity') {
+                var location = 'Home1';
+                var timestamp = new Date().getTime();
+                var light = $(this).attr('value');
+                var status = (parseFloat(light) > 50.00) ? 'HUMID' : 'DRY';
+                FB.api('/me/feed', 'post', { message: location + ':' + timestamp + ':' + light + ':' + status, privacy: { value: 'ALL_FRIENDS'} }, function(response) {
+                  if (!response || response.error) {
+                    console.error('Error occurred while posting');
+                  } else {
+                    console.info('Post ID: ' + response.id);
+                  }
+                });
+              }
+            });
+          }
+        }); 
+      },
+      error: function() {
+        alert("Cannot get humidity reading");
+      }
+    });
+  }
+
+};
+
+// Load the SDK's source Asynchronously
+(function(d, debug){
+  var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement('script'); js.id = id; js.async = true;
+  js.src = "http://connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+  ref.parentNode.insertBefore(js, ref);
+}(document, /*debug*/ false));
+
+</script>
+Streaming Page for Humidity Sensor Home 1
+<div class="fb-login-button" data-show-faces="true" data-scope="user_likes,user_photos,publish_actions"></div>
+</body>
+</html>
