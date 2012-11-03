@@ -5,7 +5,7 @@ SNUF
 
 by _Alejandro Gutierrez_, _Nicholas Chen_, _Gopal Santhanaraman_ and _Yun Young Lee_
 
-![](http://i46.tinypic.com/33yp5k7.jpg)
+<img src="http://i46.tinypic.com/33yp5k7.jpg" height="500px"/>
 
 What problem are you intending to solve?
 ----------------------------------------
